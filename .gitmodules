@@ -1,0 +1,9 @@
+[submodule "SpookFlare"]
+	path = SpookFlare
+	url = https://github.com/hlldz/SpookFlare
+[submodule "pypykatz"]
+	path = pypykatz
+	url = https://github.com/skelsec/pypykatz
+[submodule "impacket"]
+	path = impacket
+	url = https://github.com/SecureAuthCorp/impacket
