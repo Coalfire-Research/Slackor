@@ -1135,6 +1135,8 @@ hostname - Displays the name of the host
            Usage: hostname
 ifconfig - Displays interface information
            Usage: ifconfig
+getip - Get external IP address (makes a DNS request)
+           Usage: getip
 ls - list directory contents
            Usage: ls [DIRECTORY]
 mkdir - creates a directory
