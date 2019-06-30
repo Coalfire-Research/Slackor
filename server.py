@@ -1137,6 +1137,8 @@ ifconfig - Displays interface information
            Usage: ifconfig
 ls - list directory contents
            Usage: ls [DIRECTORY]
+find - search directory filenames
+           Usage: find [GLOB]
 mkdir - creates a directory
            Usage: mkdir [DIRPATH]
 pwd - prints the current working directory
