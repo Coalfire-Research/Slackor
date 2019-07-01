@@ -338,15 +338,15 @@ def response_check(bearer, responses, token, timestamp):
                         # First message from a longJob, initialize the key
                             longJobs[job_id] = text
 
-            if longJobs != "":  # If there are any longJobs, loop through them
-                for key in longJobs:
-                    processed_ids.append(key)
-                    print(color("\nMessage response for job " + key + ":\n", "blue"))
-                    try:
-                        text = aes_encrypt.decrypt(longJobs[key]).decode('UTF-8')
-                        print(filter_nonprintable(text))
-                    except UnicodeDecodeError:
-                        print("Response contains non-unicode characters.  Could not print to terminal.")
+    if longJobs != "":  # If there are any longJobs, loop through them
+        for key in longJobs:
+            processed_ids.append(key)
+            print(color("\nMessage response for job " + key + ":\n", "blue"))
+            try:
+                text = aes_encrypt.decrypt(longJobs[key]).decode('UTF-8')
+                print(filter_nonprintable(text))
+            except UnicodeDecodeError:
+                print("Response contains non-unicode characters.  Could not print to terminal.")
 
 
 def kill(bearer, commands, client_id):  # Function to send a kill command to an agent
