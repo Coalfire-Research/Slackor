@@ -100,6 +100,8 @@ Here are several OPSEC safe commands that will NOT execute cmd.exe:
 
 - **cat** - prints file content
 - **cd** - change directory
+- **find** - search directory filenames 
+- **getip** - Get external IP address (makes a DNS request)
 - **hostname** - Displays the name of the host
 - **ifconfig** - Displays interface information
 - **ls** - list directory contents
@@ -125,6 +127,7 @@ Credits
 - Countless threads on StackOverflow
 - Thanks to [impacket](https://github.com/SecureAuthCorp/impacket) for dumping hashes from SAM/SYS/SECURITY reg hives. 
 - LSASS dump credential extraction made possbile using [pypykatz](https://github.com/skelsec/pypykatz) by skelsec
+- Bob Aman ([Sporkmonger](https://github.com/sporkmonger)) for various additions
 
 Future goals 
 =====
