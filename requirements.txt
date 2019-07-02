@@ -1,6 +1,4 @@
-﻿pycrypto
+pycrypto
 requests
 prettytable
-minidump>=0.0.6
-minikerberos>=0.0.8
-ldap3==2.5.1
+pypykatz
