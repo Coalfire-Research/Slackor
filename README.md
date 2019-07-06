@@ -28,7 +28,7 @@ This repo contains five files:
 - ```install.sh``` Installs dependancies
 - ```setup.py``` The script to create the slack channels, database, and implant
 - ```server.py``` The Slackor server, designed to be ran on Linux
-- ```template.go``` Template for the generated implant
+- ```agent.go``` The generated implant
 - ```requirements.txt``` Python dependencies (installed automatically)
 
 To get started:
