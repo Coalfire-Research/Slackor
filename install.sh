@@ -6,6 +6,7 @@ go get golang.org/x/sys/windows
 go get github.com/atotto/clipboard
 go get github.com/miekg/dns
 go get github.com/bmatcuk/doublestar
+go get github.com/dustin/go-humanize
 pip3 install -r requirements.txt
 cd impacket
 python setup.py install

