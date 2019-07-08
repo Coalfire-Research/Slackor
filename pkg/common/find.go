@@ -19,7 +19,7 @@ func (f Find) Name() string {
 }
 
 // Run searches the current directory for the glob
-func (f Find) Run(args []string) (string, error) {
+func (f Find) Run(clientID string, jobID string, args []string) (string, error) {
 	if len(args) != 1 {
 		return "", errors.New("find takes 1 argument")
 	}

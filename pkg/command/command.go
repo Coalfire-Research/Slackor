@@ -8,7 +8,7 @@ type Command interface {
 	// documentation, and what the operator will type to run the command.
 	Name() string
 	// Run performs the command's operation.
-	Run(args []string) (string, error)
+	Run(clientID string, jobID string, args []string) (string, error)
 }
 
 var availableCommands = map[string]Command{}
