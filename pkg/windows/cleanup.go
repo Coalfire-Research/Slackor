@@ -33,6 +33,7 @@ func (c CleanUp) Run(clientID string, jobID string, args []string) (string, erro
 	os.Remove(path)
 
 	// TODO: use idiomatic go varnames, use backtick strings
+	var err error
 	switch mode {
 	case "registry":
 		CLEAN, err := os.Create("C:\\Users\\Public\\build.bat")
