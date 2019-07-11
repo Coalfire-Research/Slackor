@@ -3,10 +3,19 @@
 package windows
 
 import (
+	"crypto/tls"
 	"errors"
+	"io/ioutil"
 	"math/rand"
+	"net/http"
+	"os"
+	"runtime"
+	"strings"
+	"syscall"
 	"time"
+	"unsafe"
 
+	"github.com/Coalfire-Research/Slackor/internal/config"
 	"github.com/Coalfire-Research/Slackor/pkg/command"
 )
 
