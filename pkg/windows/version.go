@@ -14,12 +14,12 @@ import (
 type Version struct{}
 
 // Name is the name of the command
-func (v Version) Name() string {
+func (ver Version) Name() string {
 	return "version"
 }
 
 // Run gets the OS version
-func (v Version) Run(clientID string, jobID string, args []string) (string, error) {
+func (ver Version) Run(clientID string, jobID string, args []string) (string, error) {
 	if config.OSVersion != "" {
 		return config.OSVersion, nil
 	}

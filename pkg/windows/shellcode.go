@@ -4,7 +4,6 @@ package windows
 
 import (
 	"errors"
-	"strconv"
 	"time"
 
 	"github.com/Coalfire-Research/Slackor/pkg/command"
