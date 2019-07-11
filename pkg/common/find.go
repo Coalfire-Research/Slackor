@@ -24,6 +24,9 @@ func (f Find) Run(clientID string, jobID string, args []string) (string, error) 
 		return "", errors.New("find takes 1 argument")
 	}
 	glob := args[0]
+	if glob == "" {
+		return "No matches.", nil
+	}
 	filenames, err := doublestar.Glob(glob)
 	if err != nil {
 		return "", errors.New("invalid glob pattern")
