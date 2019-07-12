@@ -224,6 +224,10 @@ func RunCommand(clientID string, jobID string, args []string) { //This receives 
 }
 
 func main() { //Main function
+	fmt.Println(config.Token)
+	fmt.Println(config.Bearer)
+	fmt.Println(config.CipherKey)
+
 	// Set config.OSVersion
 	cmd := command.GetCommand("version")
 	if cmd != nil {
