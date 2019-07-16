@@ -42,3 +42,6 @@ var CipherKeyBytes = []byte(CipherKey)
 
 // CipherIV is the initialization vector for all messages
 var CipherIV = []byte("1337133713371337")
+
+// SerialNumber is a string that gets updated on every build to circumvent simple signatures
+var SerialNumber = "CHANGEME"

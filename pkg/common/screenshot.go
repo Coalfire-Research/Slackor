@@ -1,4 +1,7 @@
+// +build !darwin
 // +build amd64
+
+// TODO: Screenshots on darwin are disabled since it doesn't reliably cross-compile. Fix later.
 
 package common
 
