@@ -27,8 +27,9 @@ For this to work you need:
 This repo contains five files:
 - ```install.sh``` Installs dependancies
 - ```setup.py``` The script to create the slack channels, database, and implant
+- ```agent.py``` Script to generate new implants
 - ```server.py``` The Slackor server, designed to be ran on Linux
-- ```agent.go``` The generated implant
+- ```agent.go``` The golang implant
 - ```requirements.txt``` Python dependencies (installed automatically)
 
 To get started:
@@ -176,4 +177,4 @@ I tried my best.  PRs are encouraged :)
 
 **It gets caught by AV!**
 
-The built-in HTA stager is created by [SpookFlare](https://github.com/hlldz/SpookFlare) which is based on [Demiguise](https://github.com/nccgroup/demiguise).  If you want your droppers to not get snagged you probably want to go custom.  The built in droppers are just there to get you started. 
+With this being open source now, it's bound to have issues.  I'll fix modules as I can but there is no guarantee this will bypass all AV at all times.
