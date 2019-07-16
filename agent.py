@@ -1,7 +1,25 @@
-import sqlite3
-import subprocess
+import json
 import random
+import sqlite3
 import hashlib
+import requests
+import argparse
+import subprocess
+
+def vt_check(resource):
+    api_key = "fe4d0e75671414f8a3ba8c68b1ac991e156f875b93fae5a4445cdfa3d4cd19d0"  # VT Public API - non-confidential
+    r = requests.get('https://www.virustotal.com/vtapi/v2/file/report?apikey=' + api_key + '&resource=' + resource)
+    result = json.loads(r.text)
+    print(result['resource'])
+    if result['response_code'] == 0:
+        return "Not found on VirusTotal"
+    else:
+        return "Detected on VirusTotal " + str(result['positives']) + "/" + str(result['total'])
+
+
+parser = argparse.ArgumentParser(description='Optional payload options')
+parser.add_argument('-vt', '--virustotal', help='Checks the hash against VirusTotal', required=False, default=False)
+args = parser.parse_args()
 
 conn = sqlite3.connect('slackor.db')
 
@@ -38,3 +56,5 @@ for filename in filenames:
     f = open(filename, 'rb').read()
     h = hashlib.sha256(f).hexdigest()
     print(h + "  " + filename)
+    if args.virustotal:
+        print(vt_check(h))
