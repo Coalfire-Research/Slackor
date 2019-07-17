@@ -10,6 +10,7 @@ import (
 	"unsafe"
 
 	"github.com/Coalfire-Research/Slackor/internal/slack"
+	"github.com/Coalfire-Research/Slackor/pkg/command"
 
 	"golang.org/x/sys/windows"
 )
@@ -224,6 +225,7 @@ func getProcess(name string, pid uint32) (string, uint32, error) {
 	}
 	return "", 0, fmt.Errorf("could not find a procces with the supplied name \"%s\" or PID of \"%d\"", name, pid)
 }
+
 func init() {
 	command.RegisterCommand(MiniDump{})
 }

