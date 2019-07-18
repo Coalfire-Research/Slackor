@@ -1,6 +1,6 @@
-agent.32.linux
-agent.64.linux
-agent.darwin
-agent.upx.exe
-agent.windows.exe
+dist/agent.32.linux
+dist/agent.64.linux
+dist/agent.darwin
+dist/agent.upx.exe
+dist/agent.windows.exe
 slackor.db
