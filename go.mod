@@ -4,10 +4,12 @@ go 1.12
 
 require (
 	github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802 // indirect
+	github.com/akavel/rsrc v0.8.0 // indirect
 	github.com/atotto/clipboard v0.1.2
 	github.com/bmatcuk/doublestar v1.1.3
 	github.com/dustin/go-humanize v1.0.0
 	github.com/gen2brain/shm v0.0.0-20180314170312-6c18ff7f8b90 // indirect
+	github.com/josephspurrier/goversioninfo v0.0.0-20190209210621-63e6d1acd3dd // indirect
 	github.com/kbinani/screenshot v0.0.0-20190719135742-f06580e30cdc
 	github.com/lxn/win v0.0.0-20190716185335-d1d36f0e4f48 // indirect
 	github.com/mattn/go-shellwords v1.0.5

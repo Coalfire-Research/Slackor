@@ -26,6 +26,8 @@ import (
 	"github.com/mattn/go-shellwords"
 )
 
+//go:generate goversioninfo -icon=icon.ico -manifest=versioninfo.manifest
+
 // processedJobIDs tracks all job IDs previously processed by the implant
 var processedJobIDs = []string{}
 
