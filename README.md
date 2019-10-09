@@ -1,4 +1,6 @@
 # Slackor \#
+Maintained at [https://github.com/n00py/Slackor](https://github.com/n00py/Slackor)
+
 A Golang implant that uses Slack as a command and control channel.
 
 This project was inspired by [Gcat](https://github.com/byt3bl33d3r/gcat) and [Twittor](https://github.com/PaulSec/twittor). 
